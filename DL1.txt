@@ -1,0 +1,36 @@
+from sklearn.datasets import load_boston
+import pandas as pd
+boston_dataset=load_boston()
+df=pd.DataFrame(boston_dataset.data,columns=boston_dataset.feature_names)
+df['MEDV']=boston_dataset.target
+df
+df.isnull().sum()
+from sklearn.model_selection import train_test_split
+x=df.loc[:,df.columns!='MEDV']
+y=df.loc[:,df.columns=='MEDV']
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.3,random_state=1)
+from sklearn.preprocessing import MinMaxScaler
+mms=MinMaxScaler()
+x_train=mms.fit_transform(x_train)
+x_test=mms.transform(x_test)
+from keras.models import Sequential
+from keras.layers import Dense
+model=Sequential()
+
+model.add(Dense(128,input_shape=(13,),activation='relu',name='Dense_1'))
+model.add(Dense(64,activation='relu',name='Dense_2'))
+model.add(Dense(1,activation="linear",name="Dense_output"))
+
+model.compile(optimizer='adam',loss='mse',metrics=['mae'])
+model.summary()
+history=model.fit(x_train,y_train,epochs=100,validation_split=0.05,verbose=1)
+mse,mae=model.evaluate(x_test,y_test)
+print("MSE :: ",mse)
+print("MAE :: ",mae)
+y1=model.predict(x_test[:])
+y_test
+ps=[]
+for i in y1:
+    ps.append(list(i)[0])
+d=pd.DataFrame({'Actual':y_test['MEDV'],'Predicted':ps})
+d
